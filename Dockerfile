@@ -1,5 +1,5 @@
 # Base image
-FROM python:3.13.9
+FROM python:3.12-slim
 
 # Work directory
 WORKDIR /app
@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 # Ensure the trained models are included in the image
-COPY app.py ./
+COPY app.py index.html ./
 COPY iris_model.joblib iris_model_knn.joblib ./
 
 # Expose FastAPI port

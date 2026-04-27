@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <title>Iris Predictor</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
+        input { width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; margin-top: 10px;}
+        #result { margin-top: 20px; font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <h2>Iris Flower Predictor</h2>
+    <label for="sl"></label><input type="number" id="sl" placeholder="Sepal Length" step="0.1">
+    <label for="sw"></label><input type="number" id="sw" placeholder="Sepal Width" step="0.1">
+    <label for="pl"></label><input type="number" id="pl" placeholder="Petal Length" step="0.1">
+    <label for="pw"></label><input type="number" id="pw" placeholder="Petal Width" step="0.1">
+    
+    <button onclick="predict('logistic')">Predict (Logistic)</button>
+    <button onclick="predict('KNN')" style="background: #17a2b8;">Predict (KNN)</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function predict(modelType) {
+            const data = {
+                sepal_length: parseFloat(document.getElementById('sl').value),
+                sepal_width: parseFloat(document.getElementById('sw').value),
+                petal_length: parseFloat(document.getElementById('pl').value),
+                petal_width: parseFloat(document.getElementById('pw').value)
+            };
+
+            const response = await fetch(`/predict/iris_${modelType}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            document.getElementById('result').innerText = "Prediction: " + result.iris_prediction;
+        }
+    </script>
+</body>
+</html>

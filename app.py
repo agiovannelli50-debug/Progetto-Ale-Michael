@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 import joblib
 import pandas as pd
 import numpy as np
+from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="IRIS PREDICTION")
 
@@ -11,9 +12,13 @@ iris_logistic_model = joblib.load("/app/iris_model.joblib")
 iris_KNN_model = joblib.load("/app/iris_model_knn.joblib")
 
 
-@app.get("/")
-def home():
-    return {"message": "IRIS API is running"}
+@app.get("/", response_class=HTMLResponse)
+def main_page():
+    try:
+        with open("index.html", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "<h1>Errore: file index.html non trovato nel container</h1>"
 
 
 class IrisFeatures(BaseModel):
