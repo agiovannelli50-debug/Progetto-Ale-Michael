@@ -11,6 +11,7 @@ API REST basata su FastAPI per classificazione del dataset Iris tramite:
 
 ## Struttura progetto
 
+*
 /app
  ├── app.py
  ├── index.html
@@ -18,6 +19,7 @@ API REST basata su FastAPI per classificazione del dataset Iris tramite:
  ├── iris_model_knn.joblib
  ├── requirements.txt
  └── Dockerfile
+*
 
 ---
 
