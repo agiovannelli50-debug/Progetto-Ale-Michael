@@ -58,8 +58,6 @@ Dati due punti (P1, P2) in uno spazio bidimensionale, la distanza di Manhattan �
 
 ---
 
-* **Scelta del Parametro k:**
-
 ## 1. k piccolo (es. k=1)
 
 Quando k è molto basso, il modello si basa solo sul primo vicino, risutlando quindi sensibile alla presenza di eventuali outliers.
@@ -120,7 +118,7 @@ Non esiste un valore universale per k (dipende dai dati), quindi per trovare il 
 
 ## Setup
 
-### Distribuzione con Docker
+### Docker
 ```bash
 docker build -t iris-api .
 docker run -p 8079:8000 iris-api
@@ -132,9 +130,9 @@ docker run -p 8079:8000 iris-api
 ```text
 /app
 ├── app.py                # Logica FastAPI e routing
-├── index.html            # Interfaccia UI minimale
+├── index.html            # Interfaccia UI 
 ├── iris_model.joblib     # Pesi Logistic Regression
-├── iris_model_knn.joblib # Dataset indicizzato KNN
-├── requirements.txt      # Dipendenze del progetto
+├── iris_model_knn.joblib # Pesi KNN
+├── requirements.txt      # Dipendenze
 └── Dockerfile            # Containerizzazione
 ```
