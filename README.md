@@ -9,18 +9,6 @@ API REST basata su FastAPI per classificazione del dataset Iris tramite:
 
 ---
 
-## Struttura progetto
-
-/app
-├── app.py
-├── index.html
-├── iris_model.joblib
-├── iris_model_knn.joblib
-├── requirements.txt
-└── Dockerfile
-
----
-
 ## Accesso
 
 * API docs: http://localhost:8079/docs
