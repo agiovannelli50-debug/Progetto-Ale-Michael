@@ -107,7 +107,7 @@ Usare K-Fold CV per selezionare k o altri iperparametri: suddividere i dati, all
 ### Distribuzione con Docker
 ```bash
 docker build -t wine-api .
-docker run -p 8079:8000 wine-api
+docker run -p 8098:8000 wine-api
 ```
 
 ---
