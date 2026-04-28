@@ -130,4 +130,4 @@ plt.show()
 print("\nEsportazione modelli")
 joblib.dump(knn_model, 'knn_model.pkl')
 joblib.dump(model, 'logistic_regression_model.pkl')
-
+joblib.dump(scaler, 'scaler.pkl')

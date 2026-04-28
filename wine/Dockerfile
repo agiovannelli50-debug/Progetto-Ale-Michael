@@ -7,7 +7,7 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py index.html knn_model.pkl logistic_regression_model_knn.pkl ./
+COPY app.py index.html knn_model.pkl logistic_regression_model.pkl scaler.pkl ./
 
 EXPOSE 8000
 

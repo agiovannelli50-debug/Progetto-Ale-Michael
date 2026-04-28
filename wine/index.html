@@ -60,17 +60,17 @@
                 proline: parseFloat(document.getElementById('prol').value)
             };
 
-            // Invia richiesta POST all' endpoint appropriato
+            // Invia richiesta POST all' endpoint appropriato, con i dati (features) del vino
             // ${modelType} - Tipo di modello in base al bottone cliccato
             const response = await fetch(`/predict/wine_${modelType}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            
-            // Converte la risposta in oggetto Javascript
+
+            // Aspetta la risposta del server e la converte da JSON a un oggetto Javascript
             const result = await response.json();
-            // Mostra il risultato della previsione di result
+            // Mostra il risultato della previsione di result e concatena dentro il contenitore (html) con id="result".
             document.getElementById('result').innerText = "Wine Class Prediction: " + result.wine_prediction;
         }
     </script>
