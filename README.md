@@ -5,6 +5,8 @@
 * **Interactive API Docs:** [http://localhost:8079/docs](http://localhost:8079/docs)
 * **Web User Interface:** [http://localhost:8079/](http://localhost:8079/)
 
+(+ interfaccia web minimale per input manuale)
+
 ---
 
 ## Modelli Implementati
@@ -12,38 +14,81 @@
 L'API permette di confrontare i risultati tra un approccio parametrico e uno non parametrico.
 
 ### 1. Logistic Regression (Multinomiale)
-Modello probabilistico basato sulla massimizzazione della verosimiglianza.
 
-* **Logica Matematica:** Trasformazione lineare delle feature seguita dall'applicazione della funzione **Sigmoide**:
+Si parte da una combinazione lineare delle features.
+
+* **Logica Matematica:** Si parte da una combinazione lineare delle features seguita dall'applicazione della funzione **Sigmoide**:
   
     $$\sigma(z)=\frac{1}{1+e^{-z}}$$
+
+  L'elemento verrà classificato in base a dove si posiziona sulla curva ( o rispeto alla treshold).
   
-* **Ottimizzazione:** Il modello minimizza la **Log-Loss** (Negative Log-Likelihood) per allineare le probabilità stimate alle etichette reali:
-* 
+* **Ottimizzazione:** L'obiettivo originale è la Maximum Likelihood Estimation (MLE), quindi trovare i parametri che massimizzano la probabilità di osservare i dati che abbiamo nel dataset.
+
     $$L = -\frac{1}{m}\sum_{i=1}^{m} [y^{(i)}\log(p^{(i)}) + (1-y^{(i)})\log(1-p^{(i)})]$$
-  
-* **Output:** Probabilità stimata per ogni classe con classificazione basata su soglia (*threshold*).
+
+Lavorare con i prodotti di probabilità che sono spesso numeri molto piccoli, può risultare complesso. Per questo si usa il logaritmo, che:
+
+1) Trasforma i prodotti in somme, semplificando il calcolo del gradiente.
+
+2) Mantiene i punti di massimo/minimo (poiché funzione monotona crescente).
+
+3) Cambia la prospettiva del problema; aggiungendo il segno meno (Negative Log-Likelihood) si cerca di minimizzare l'errore.
+
+---
 
 ### 2. K-Nearest Neighbors (KNN)
 Algoritmo di apprendimento supervisionato **non parametrico** che esegue previsioni basate sulla similarità locale.
 
 * **Principio:** Classifica un punto $x$ analizzando i k-campioni più vicini nel training set.
-  
-* **Metriche di Distanza:**
-  
-    * **Euclidea:** $d(x,y)=\sqrt{\sum_{i=1}^{n}(x_i-y_i)^2}$ (Standard).
-  
-    * **Manhattan:** $d(x,y)=\sum_{i=1}^{n}|x_i-y_i|$ (Robusta contro outlier).
-
-      
-* **Ottimizzazione del Parametro $k$:**
-  
-    Implementata tramite **K-Fold Cross-Validation** per identificare l'**Elbow Point** (punto di equilibrio tra bias e varianza).
-    > **Nota:** Utilizzo di $k$ dispari per evitare pareggi e pre-processamento tramite **Feature Scaling** (Standardizzazione) obbligatorio.
 
 ---
 
-## Specifiche Endpoints
+* **Metriche di Distanza:**
+  
+La più comune ed usata è la Distanza Euclidea:
+
+  $$d(x,y)=\sqrt{\sum_{i=1}^{n}(x_i-y_i)^2}$$
+
+Ci sono alternative, come ad esempio la Manhattan Distance:
+
+  $$d(x,y)=\sum_{i=1}^{n}|x_i-y_i|$$
+
+Dati due punti (P1, P2) in uno spazio bidimensionale, la distanza di Manhattan è la somma dei valori assoluti (moduli) delle differenze delle loro coordinate. (è sempre maggiore o uguale rispetto alla distanza euclidea)
+
+---
+
+* **Scelta del Parametro k:**
+
+## 1. k piccolo (es. k=1)
+
+Quando k è molto basso, il modello si basa solo sul primo vicino, risutlando quindi sensibile alla presenza di eventuali outliers.
+
+**Risultato:** Errore zero sul training set, ma pessime performance su test set.
+
+## 2. k grande (es. k=101)
+
+Quando k è molto alto, il modello diventa rigido, non riuscendo più a cogliere sfumature presenti nei dati.
+
+Se k è uguale al numero totale di campioni, l'algoritmo predirrà sempre la classe più frequente nel dataset, a prescindere dalla posizione del punto.
+
+**Risultato:** Errore simile sia su training che su test set.
+
+---
+
+## 3. Ottimizzazione tramite Cross-Validation
+Non esiste un valore universale per k (dipende dai dati), quindi per trovare il valore migliore si usa la **K-Fold Cross-Validation**:
+
+1.  **Suddivisione:** Il dataset viene diviso in X parti (fold).
+2.  **Iterazione:** Si prova un valore di k (es. k=3). L'algoritmo viene addestrato su X-1 parti e testato sulla parte rimanente. Si ripete questo processo per ogni fold.
+3.  **Media:** Si calcola l'errore medio per quel k.
+4.  **Confronto:** Si ripete il tutto per diversi valori di k.
+
+**Obiettivo:** Trovare il l'elbow point nel grafico dell'errore, dove l'errore sul set di validazione è minimo. (derivata = 0)
+
+---
+
+## Endpoints
 
 ### Predizione via Logistic Regression
 `POST /predict/iris_logistic`
