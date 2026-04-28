@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Wine Classifier</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 500px; margin: 30px auto; padding: 25px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #722f37; } /* Colore vinaccia */
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .input-group { margin-bottom: 10px; }
+        label { font-size: 0.85em; color: #555; display: block; margin-bottom: 2px; }
+        input { width: 90%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .buttons { margin-top: 20px; }
+        button { width: 100%; padding: 12px; color: white; border: none; cursor: pointer; border-radius: 6px; font-weight: bold; margin-bottom: 10px; transition: opacity 0.3s; }
+        button:hover { opacity: 0.9; }
+        #result { margin-top: 20px; padding: 15px; text-align: center; font-size: 1.2em; font-weight: bold; border-radius: 6px; background: #f8f9fa; color: #722f37; }
+    </style>
+</head>
+<body>
+    <h2>Wine Class Predictor</h2>
+
+    <div class="grid-container">
+        <div class="input-group"><label>Alcohol</label><input type="number" id="alc" step="0.01"></div>
+        <div class="input-group"><label>Malic Acid</label><input type="number" id="ma" step="0.01"></div>
+        <div class="input-group"><label>Ash</label><input type="number" id="ash" step="0.01"></div>
+        <div class="input-group"><label>Alcalinity of Ash</label><input type="number" id="aoa" step="0.1"></div>
+        <div class="input-group"><label>Magnesium</label><input type="number" id="mag" step="1"></div>
+        <div class="input-group"><label>Total Phenols</label><input type="number" id="tp" step="0.01"></div>
+        <div class="input-group"><label>Flavanoids</label><input type="number" id="flav" step="0.01"></div>
+        <div class="input-group"><label>Nonflavanoid Phenols</label><input type="number" id="nfp" step="0.01"></div>
+        <div class="input-group"><label>Proanthocyanins</label><input type="number" id="proa" step="0.01"></div>
+        <div class="input-group"><label>Color Intensity</label><input type="number" id="ci" step="0.01"></div>
+        <div class="input-group"><label>Hue</label><input type="number" id="hue" step="0.01"></div>
+        <div class="input-group"><label>OD280/OD315</label><input type="number" id="od" step="0.01"></div>
+        <div class="input-group"><label>Proline</label><input type="number" id="prol" step="1"></div>
+    </div>
+
+    <div class="buttons">
+        <button onclick="predict('logistic')" style="background: #722f37;">Predict (Logistic Regression)</button>
+        <button onclick="predict('KNN')" style="background: #4a1a1f;">Predict (KNN)</button>
+    </div>
+
+    <div id="result">Seleziona i valori e clicca</div>
+
+    <script>
+        async function predict(modelType) {
+            const data = {
+                alcohol: parseFloat(document.getElementById('alc').value),
+                malic_acid: parseFloat(document.getElementById('ma').value),
+                ash: parseFloat(document.getElementById('ash').value),
+                alcalinity_of_ash: parseFloat(document.getElementById('aoa').value),
+                magnesium: parseFloat(document.getElementById('mag').value),
+                total_phenols: parseFloat(document.getElementById('tp').value),
+                flavanoids: parseFloat(document.getElementById('flav').value),
+                nonflavanoid_phenols: parseFloat(document.getElementById('nfp').value),
+                proanthocyanins: parseFloat(document.getElementById('proa').value),
+                color_intensity: parseFloat(document.getElementById('ci').value),
+                hue: parseFloat(document.getElementById('hue').value),                 // Intensità Colore Vino
+                od280_od315: parseFloat(document.getElementById('od').value),          // indicatore di densità ottica
+                proline: parseFloat(document.getElementById('prol').value)
+            };
+
+            // Invia richiesta POST all' endpoint appropriato
+            // ${modelType} - Tipo di modello in base al bottone cliccato
+            const response = await fetch(`/predict/wine_${modelType}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            // Converte la risposta in oggetto Javascript
+            const result = await response.json();
+            // Mostra il risultato della previsione di result
+            document.getElementById('result').innerText = "Wine Class Prediction: " + result.wine_prediction;
+        }
+    </script>
+</body>
+</html>
