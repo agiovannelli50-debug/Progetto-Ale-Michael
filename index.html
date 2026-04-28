@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
     <title>Iris Predictor</title>
+        <!-- styling della homepage -->
     <style>
         body { font-family: sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
         input { width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
@@ -11,32 +12,39 @@
 </head>
 <body>
     <h2>Iris Flower Predictor</h2>
+        <!-- input dell'utente - (step = incremento minimo dei campi di input) -->
     <label for="sl"></label><input type="number" id="sl" placeholder="Sepal Length" step="0.1">
     <label for="sw"></label><input type="number" id="sw" placeholder="Sepal Width" step="0.1">
     <label for="pl"></label><input type="number" id="pl" placeholder="Petal Length" step="0.1">
     <label for="pw"></label><input type="number" id="pw" placeholder="Petal Width" step="0.1">
-    
+
+    <!-- bottoni - (onclick chiama la funzione predict quando premo il bottone) -->
     <button onclick="predict('logistic')">Predict (Logistic)</button>
     <button onclick="predict('KNN')" style="background: #17a2b8;">Predict (KNN)</button>
 
     <div id="result"></div>
 
     <script>
+        // Funzione per previsioni sul tipo di iris
         async function predict(modelType) {
+             // Raccoglie i dati e li converte in numeri
             const data = {
                 sepal_length: parseFloat(document.getElementById('sl').value),
                 sepal_width: parseFloat(document.getElementById('sw').value),
                 petal_length: parseFloat(document.getElementById('pl').value),
                 petal_width: parseFloat(document.getElementById('pw').value)
             };
-
+            // invia richiesta POST all' endpoint appropriato
+            // ${modelType} - tipo di modello in base al bottone cliccato
             const response = await fetch(`/predict/iris_${modelType}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+                body: JSON.stringify(data) // converte l'oggetto data in JSON
             });
-            
+
+            //converte la risposta in oggetto Javascript
             const result = await response.json();
+            // Mostra il risultato della previsione di result
             document.getElementById('result').innerText = "Prediction: " + result.iris_prediction;
         }
     </script>

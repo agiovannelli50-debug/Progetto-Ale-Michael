@@ -1,21 +1,17 @@
-# Base image
+#prendiamo versione slim di python cosi i tempi si riducono
 FROM python:3.12-slim
 
-# Work directory
 WORKDIR /app
 
-# Install dependencies
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
-# Ensure the trained models are included in the image
-COPY app.py index.html ./
-COPY iris_model.joblib iris_model_knn.joblib ./
+COPY app.py index.html iris_model.joblib iris_model_knn.joblib ./
 
-# Expose FastAPI port
 EXPOSE 8000
 
-# Run app
+#uvicorn fa girare fastAPI
+#"app:app" indica percorso per trovare fastapi (app.py --> app=...)
+#"--host", "0.0.0.0" per dire a docker di accettare connessioni anche dall'esterno
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
