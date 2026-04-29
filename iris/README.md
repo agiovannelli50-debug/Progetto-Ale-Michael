@@ -15,13 +15,14 @@ L'API permette di confrontare i risultati tra un approccio parametrico e uno non
 
 ### 1. Logistic Regression (Multinomiale)
 
-Si parte da una combinazione lineare delle features.
+ a) Per la Regressione Logistica semplice:
 
 * **Logica Matematica:** Si parte da una combinazione lineare delle features seguita dall'applicazione della funzione **Sigmoide**:
   
     $$\sigma(z)=\frac{1}{1+e^{-z}}$$
 
   L'elemento verrà classificato in base a dove si posiziona sulla curva ( o rispeto alla treshold).
+
   
 * **Ottimizzazione:** L'obiettivo originale è la Maximum Likelihood Estimation (MLE), quindi trovare i parametri che massimizzano la probabilità di osservare i dati che abbiamo nel dataset.
 
@@ -33,8 +34,22 @@ Lavorare con i prodotti di probabilità che sono spesso numeri molto piccoli, pu
 
 2) Mantiene i punti di massimo/minimo (poiché funzione monotona crescente).
 
-3) Cambia la prospettiva del problema; aggiungendo il segno meno (Negative Log-Likelihood) si cerca di minimizzare l'errore.
+3) Cambia  prospettiva del problema; aggiungendo il segno meno (Negative Log-Likelihood) si cerca di minimizzare l'errore.
 
+b) Regressione Logistica Multinomiale:
+
+* **Logica Matematica (Softmax):**
+
+    $$\text{softmax}(z)_j=\frac{e^{z_j}}{\sum_{k} e^{z_k}}$$
+
+La funzione softmax è una funzione matematica utilizzata per convertire un vettore di numeri reali in una distribuzione di probabilità.
+
+Mappa i valori in input nell'intervallo e assicura che la somma di tutti gli output sia esattamente 1.
+
+Caratteristiche:
+1) Normalizzazione: Garantisce che la somma delle probabilità sia 1
+2) Positività: Restituisce solo valori compresi tra 0 e 1
+3) Amplificazione: L'esponenziale amplifica le differenze tra i punteggi, rendendo più netto il valore massimo
 ---
 
 ### 2. K-Nearest Neighbors (KNN)

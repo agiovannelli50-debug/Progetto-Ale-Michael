@@ -21,10 +21,14 @@ Estensione della regressione logistica a più classi tramite softmax.
 
     $$\text{softmax}(z)_j=\frac{e^{z_j}}{\sum_{k} e^{z_k}}$$
 
-  L'elemento viene classificato in base alla probabilità massima tra le classi.
+La funzione softmax è una funzione matematica utilizzata per convertire un vettore di numeri reali in una distribuzione di probabilità.
 
-* **Ottimizzazione:** Si massimizza la Likelihood; si minimizza la Negative Log-Likelihood (NLL) per la classificazione multi-classe.
+Mappa i valori in input nell'intervallo e assicura che la somma di tutti gli output sia esattamente 1.
 
+Caratteristiche:
+* Normalizzazione: Garantisce che la somma delle probabilità sia 1
+* Positività: Restituisce solo valori compresi tra 0 e 1
+* Amplificazione: L'esponenziale amplifica le differenze tra i punteggi, rendendo più netto il valore massimo
 ---
 
 ### 2. K-Nearest Neighbors (KNN)
@@ -46,13 +50,11 @@ Alternativa: Manhattan Distance
 
 ---
 
-* **Scelta del Parametro k:**
-
-## 1. k piccolo (es. k=1)
+## 1. k piccolo 
 
 Sensibile agli outlier — errore basso sul training ma possibile overfitting.
 
-## 2. k grande (es. k elevato)
+## 2. k grande 
 
 Modello troppo rigido; tende a prevedere la classe più frequente se k → N.
 
