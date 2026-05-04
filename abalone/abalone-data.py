@@ -1,7 +1,3 @@
-import os
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["OMP_NUM_THREADS"] = "1"
-
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -13,16 +9,18 @@ from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import RobustScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import joblib
 from ucimlrepo import fetch_ucirepo
+import keras
 from keras.models import Sequential
-from keras.layers import Dense,Dropout, Input, BatchNormalization
-from keras.layers import Input
-from keras.optimizers import Adam
-
+from keras.layers import Dense, Input, BatchNormalization, Dropout
+from keras.callbacks import EarlyStopping
 from xgboost import XGBRegressor
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 # fetch dataset
@@ -54,16 +52,6 @@ print("Statistiche dataset:\n",df.describe(),"\n")
 # (drop della prima per evitare multicollinearità con altre dummy columns)
 
 df = pd.get_dummies(df, columns=['Sex'], dtype=int, drop_first=True)
-
-
-### NORMALIZZAZIONE DATASET
-# Standardizza le feature sottraendo la media e dividendo per la deviazione standard
-# z = (x - mean) / std
-
-scaler = StandardScaler()
-df_fit = scaler.fit_transform(df)            # calcola la media e dev standard
-df_norm = scaler.transform(df)               # applica la trasformazione
-#print(df_norm)
 
 ### MATRICE CORRELAZIONE & HEATMAP
 #  Per trovare pattern tra variabili diverse, heatmap su dati normalizzati è quasi sempre scelta corretta.
@@ -111,7 +99,7 @@ df = df.drop(columns=['Length', 'Diameter', 'Height', 'Whole_weight',
                      'Viscera_weight', 'Shucked_weight', 'Shell_weight'])
 
 ### NORMALIZZAZIONE DATASET dopo FEATURE ENGINEERING
-scaler = StandardScaler()
+scaler = RobustScaler()
 df_fit2 = scaler.fit_transform(df)
 # Trasformiamo l'array di nuovo in un DataFrame per mantenere i nomi delle colonne
 df_norm2 = pd.DataFrame(df_fit2, columns=df.columns)
@@ -130,42 +118,13 @@ X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.2, r
 
 models = [
     ("Linear Regression", LinearRegression()),
-    ("Polynomial (Grado 2)", make_pipeline(PolynomialFeatures(degree=2), LinearRegression())),
+    ("Polynomial (Grado 2)", make_pipeline(PolynomialFeatures(degree=2), StandardScaler(), LinearRegression())),
     ("Lasso (L1)", Lasso()),
     ("Ridge (L2)", Ridge()),
     ("Random Forest", RandomForestRegressor(random_state=42)),
     ("Gradient Boosting", GradientBoostingRegressor(n_estimators=100, learning_rate=0.01,random_state=42)),
     ("XGBoost", XGBRegressor(n_estimators=100, learning_rate=0.01,random_state=42))
 ]
-
-print(f"{'Modello':<20} | {'R2 Score':<10} | {'MAE':<10}")
-print("-" * 45)
-
-best_mae = float('inf')  # Iniziamo con un errore infinito
-best_model_name = ""
-best_cm = None
-
-for name, model in models:
-    model.fit(X_train, y_train.values.ravel())             # .ravel() serve a far vedere una lista e non una colonna
-    predictions = model.predict(X_test)
-
-    # Metriche Regressione
-    r2 = r2_score(y_test, predictions)
-    mae = mean_absolute_error(y_test, predictions)
-
-    # Metriche Classificazione (Arrotondando)
-    y_pred_discrete = np.round(predictions).astype(int)
-    acc = accuracy_score(y_test, y_pred_discrete)
-
-    # LOGICA PER IL MIGLIORE:
-    if mae < best_mae:
-        best_mae = mae
-        best_model_name = name
-        best_cm = confusion_matrix(y_test, y_pred_discrete)
-
-    print(f"{name:<20} | R2: {r2:>6.3f} | MAE: {mae:>6.3f} | Acc: {acc:>6.2%}")
-
-
 
 '''
 ### VISUALIZZAZIONE CONFUSION MATRIX
@@ -180,43 +139,29 @@ plt.show()
 
 
 
-n_cols = df_norm2.shape[1] # number of predictors
+### Neural network Model
 
+model = Sequential()
+n_cols = df_norm2.shape[1]
 
-# Neural network Model
-def create_model(n_cols):
-    model = Sequential()
+model.add(Input(shape=(n_cols,)))
+model.add(Dense(128, activation='relu'))
+model.add(BatchNormalization())
 
-    # Input Layer
-    model.add(Input(shape=(n_cols,)))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
 
-    # Layer 1
-    model.add(Dense(128, activation='relu'))
-    model.add(BatchNormalization())  # Normalizza i dati internamente per ogni layer.
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.1))
 
-    # Layer 2
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.2))  # Spegne casualmente dei neuroni(20% in questo caso) durante l'addestramento, forzando la rete a
-                             # non fare affidamento su una singola feature ma a guardare l'insieme dei dati.
+model.add(Dense(1))
 
-    # Layer 3
-    model.add(Dense(32, activation='relu'))
-    model.add(Dropout(0.1))
+early_stop = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)
 
-    # Output Layer
-    model.add(Dense(1))
+model.compile(optimizer='adam', loss='mean_squared_error')
+model.fit(X_train, y_train.values.ravel(), epochs=200, batch_size=32, validation_split=0.2, callbacks=[early_stop], verbose=1)
 
-
-    # Adam regola automaticamente la velocità di aggiornamento dei pesi durante il training.
-    optimizer = Adam(learning_rate=0.001)
-    model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
-
-    return model
-
-
-# Costruzione della rete
-network_model = create_model(n_cols=n_cols)
-
-# fit the model
-network_model.fit(df_norm2, y, validation_split=0.3, epochs=100, verbose=2)
-
+predictions = model.predict(X_test).flatten()
+r2 = r2_score(y_test, predictions)
+mae = mean_absolute_error(y_test, predictions)
+print(f"{'Neural Network':<20} | R2: {r2:>6.3f} | MAE: {mae:>6.3f}")
