@@ -1,7 +1,10 @@
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["OMP_NUM_THREADS"] = "1"
+
 import pandas as pd
 import numpy as np
 import seaborn as sns
-from sklearn.datasets import load_wine
 from matplotlib import pyplot as plt
 from seaborn import heatmap
 from sklearn.model_selection import train_test_split
@@ -11,10 +14,16 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
-from xgboost import XGBRegressor
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import joblib
 from ucimlrepo import fetch_ucirepo
+from keras.models import Sequential
+from keras.layers import Dense,Dropout, Input, BatchNormalization
+from keras.layers import Input
+from keras.optimizers import Adam
+
+from xgboost import XGBRegressor
+
 
 # fetch dataset
 abalone = fetch_ucirepo(id=1)
@@ -156,6 +165,9 @@ for name, model in models:
 
     print(f"{name:<20} | R2: {r2:>6.3f} | MAE: {mae:>6.3f} | Acc: {acc:>6.2%}")
 
+
+
+'''
 ### VISUALIZZAZIONE CONFUSION MATRIX
 
 plt.figure(figsize=(10, 7))
@@ -164,4 +176,47 @@ plt.title(f"Matrice di Confusione del Miglior Modello: {best_model_name} (MAE: {
 plt.xlabel('Valori PREDETTI (Anelli)', fontsize=12, fontweight='bold')
 plt.ylabel('Valori REALI (Anelli)', fontsize=12, fontweight='bold')
 plt.show()
+'''
+
+
+
+n_cols = df_norm2.shape[1] # number of predictors
+
+
+# Neural network Model
+def create_model(n_cols):
+    model = Sequential()
+
+    # Input Layer
+    model.add(Input(shape=(n_cols,)))
+
+    # Layer 1
+    model.add(Dense(128, activation='relu'))
+    model.add(BatchNormalization())  # Normalizza i dati internamente per ogni layer.
+
+    # Layer 2
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.2))  # Spegne casualmente dei neuroni(20% in questo caso) durante l'addestramento, forzando la rete a
+                             # non fare affidamento su una singola feature ma a guardare l'insieme dei dati.
+
+    # Layer 3
+    model.add(Dense(32, activation='relu'))
+    model.add(Dropout(0.1))
+
+    # Output Layer
+    model.add(Dense(1))
+
+
+    # Adam regola automaticamente la velocità di aggiornamento dei pesi durante il training.
+    optimizer = Adam(learning_rate=0.001)
+    model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
+
+    return model
+
+
+# Costruzione della rete
+network_model = create_model(n_cols=n_cols)
+
+# fit the model
+network_model.fit(df_norm2, y, validation_split=0.3, epochs=100, verbose=2)
 
