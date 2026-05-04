@@ -26,7 +26,7 @@ df = pd.DataFrame(X, columns=wine.feature_names)
 # Data Cleaning - Il dataset è già pulito ma controlliamo per sicurezza
 print(df.isnull().sum(),"\n")
 
-
+"""
 # --- ANALISI DATASET ---
 print("Colonne dataset:\n",df.columns,"\n")
 print("Prime righe dataset:",df.head(),"\n")
@@ -34,13 +34,13 @@ print("Shape dataset:",df.shape,"\n")
 print("Info dataset:",df.info,"\n")
 print("Statistiche dataset:",df.describe(),"\n")
 
-
+"""
 
 # Matrice di Correlazione
 correlation = df.corr()
 print("\nMatrice di Correlazione:\n", correlation,"\n")
 
-
+"""
 # Heatmap
 plt.figure(figsize=(10,10))
 sns.heatmap(correlation,
@@ -52,7 +52,7 @@ sns.heatmap(correlation,
             fmt=".1f"              ## fmt=".1f" = 1 cifra dopo la virgola
         )
 plt.show()
-
+"""
 
 # Splitting di Train Data and Test Data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2)
@@ -68,8 +68,12 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)            # calcola la media e dev standard
 X_test_scaled = scaler.transform(X_test)                  #applica la trasformazione
 
+print(X_test_scaled)
 
 
+
+
+"""
 # KNN - k=13 perché sqrt di num di righe del dataset
 knn_model = KNeighborsClassifier(n_neighbors=13)
 knn_model.fit(X_train_scaled, y_train)
@@ -131,3 +135,4 @@ print("\nEsportazione modelli")
 joblib.dump(knn_model, 'knn_model.pkl')
 joblib.dump(model, 'logistic_regression_model.pkl')
 joblib.dump(scaler, 'scaler.pkl')
+"""
