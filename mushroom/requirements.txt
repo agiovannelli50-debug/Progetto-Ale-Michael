@@ -8,6 +8,8 @@ ucimlrepo
 keras
 xgboost
 tensorflow
+fastapi
+uvicorn
 
 
 

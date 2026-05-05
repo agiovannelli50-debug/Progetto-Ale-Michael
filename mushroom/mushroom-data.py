@@ -89,7 +89,7 @@ df = df.drop('veil-type', axis=1)
 
 # Combinazione feature del cappello in un unico feature cap_profile
 # Il cappello è uno dei principali indicatori di specie.
-df["cap_profile"] = (
+df["profilo_cappello"] = (
     df["cap-shape"] + "_" +
     df["cap-surface"] + "_" +
     df["cap-color"]
@@ -97,7 +97,7 @@ df["cap_profile"] = (
 
 # Combinazione feature delle lamelle in un unico feature gill_profile
 # Le lamelle sono fortemente correlate alla tossicità.
-df["gill_profile"] = (
+df["profilo_lamelle"] = (
     df["gill-attachment"] + "_" +
     df["gill-spacing"] + "_" +
     df["gill-size"] + "_" +
@@ -105,7 +105,7 @@ df["gill_profile"] = (
 )
 
 # # Combinazione feature del ganbo in un unico feature stalk_profile
-df["stalk_profile"] = (
+df["profilo_gambo"] = (
     df["stalk-shape"] + "_" +
     df["stalk-root"] + "_" +
     df["stalk-surface-above-ring"] + "_" +
@@ -115,13 +115,13 @@ df["stalk_profile"] = (
 )
 
 # Creazione feature ring_profile
-df["ring_profile"] = df["ring-number"] + "_" + df["ring-type"]
+df["profilo_anello"] = df["ring-number"] + "_" + df["ring-type"]
 
 # Dove cresce il fungo è molto indicativo.
-df["env_profile"] = df["population"] + "_" + df["habitat"]
+df["profilo_ambientale"] = df["population"] + "_" + df["habitat"]
 
 # Odore + colore delle spore = quasi classificazione perfetta.
-df["odor_spore"] = df["odor"] + "_" + df["spore-print-color"]
+df["profilo_odore_e_colore_spore"] = df["odor"] + "_" + df["spore-print-color"]
 
 # DROP colonne originali correlate
 df = df.drop(columns=['cap-shape', 'cap-surface', 'cap-color', 'bruises', 'odor',
@@ -270,3 +270,16 @@ print("Scaler salvato: scaler.pkl")
 # Salvare Neural Network (Keras)
 model.save("neural_network_model.keras")
 print("Neural Network salvata: neural_network_model.keras")
+
+
+
+'''
+df["target"] = y_encoded
+#print(df)
+
+# Per vedere quali funghi nel dataset sono commestibili
+print("\nDateset funghi commestibili:\n",df[df["target"] == 0])
+
+# Per vedere quali funghi nel dataset sono velenosi
+print("\nDataset funghi velenosi:\n ",df[df["target"] == 1])
+'''

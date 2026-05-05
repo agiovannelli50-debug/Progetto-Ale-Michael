@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Classificatore di Funghi</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 25px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: #fafafa;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32; /* verde fungo */
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-size: 0.85em;
+            color: #555;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 6px;
+            background: #f1f8e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Classificatore di Funghi 🍄</h2>
+
+    <div class="grid-container">
+
+        <div class="input-group">
+            <label>Profilo cappello</label>
+            <input type="number" id="profilo_cappello">
+        </div>
+
+        <div class="input-group">
+            <label>Profilo lamelle</label>
+            <input type="number" id="profilo_lamelle">
+        </div>
+
+        <div class="input-group">
+            <label>Profilo gambo</label>
+            <input type="number" id="profilo_gambo">
+        </div>
+
+        <div class="input-group">
+            <label>Profilo anello</label>
+            <input type="number" id="profilo_anello">
+        </div>
+
+        <div class="input-group">
+            <label>Profilo ambientale</label>
+            <input type="number" id="profilo_ambientale">
+        </div>
+
+        <div class="input-group">
+            <label>Odore + Colore spore</label>
+            <input type="number" id="profilo_odore_e_colore_spore">
+        </div>
+
+    </div>
+
+    <div class="buttons">
+
+        <button onclick="predict('xgboost')" style="background: #1b5e20;">
+            Predict (XGBoost)
+        </button>
+
+        <button onclick="predict('logistic')" style="background: #2e7d32;">
+            Predict (Logistic Regression)
+        </button>
+
+        <button onclick="predict('neural_network')" style="background: #388e3c;">
+            Predict (Neural Network)
+        </button>
+
+    </div>
+
+    <div id="result">Inserisci i valori e seleziona un modello</div>
+
+    <script>
+
+        async function predict(modelType) {
+
+            const data = {
+                profilo_cappello: parseInt(document.getElementById('profilo_cappello').value),
+                profilo_lamelle: parseInt(document.getElementById('profilo_lamelle').value),
+                profilo_gambo: parseInt(document.getElementById('profilo_gambo').value),
+                profilo_anello: parseInt(document.getElementById('profilo_anello').value),
+                profilo_ambientale: parseInt(document.getElementById('profilo_ambientale').value),
+                profilo_odore_e_colore_spore: parseInt(document.getElementById('profilo_odore_e_colore_spore').value)
+            };
+
+            const response = await fetch(`/predict/${modelType}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            let label = result.prediction == 1 ? "VELENOSO!!! NON MANGIARE!!! ☠️" : "COMMESTIBILE. BUON APPETITO 🍄";
+
+            document.getElementById('result').innerText =
+                "Prediction: " + label + " (Model: " + result.model + ")";
+
+        }
+
+    </script>
+
+</body>
+</html>
