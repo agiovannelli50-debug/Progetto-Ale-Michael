@@ -14,10 +14,10 @@ from sklearn.pipeline import make_pipeline
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import joblib
 from ucimlrepo import fetch_ucirepo
-import keras
-from keras.models import Sequential
-from keras.layers import Dense, Input, BatchNormalization, Dropout
-from keras.callbacks import EarlyStopping
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input, BatchNormalization, Dropout
+from tensorflow.keras.callbacks import EarlyStopping
 from xgboost import XGBRegressor
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -165,3 +165,40 @@ predictions = model.predict(X_test).flatten()
 r2 = r2_score(y_test, predictions)
 mae = mean_absolute_error(y_test, predictions)
 print(f"{'Neural Network':<20} | R2: {r2:>6.3f} | MAE: {mae:>6.3f}")
+
+
+
+
+### SALVATAGGIO MODELLI
+
+# Dizionario per salvare tutti i modelli sklearn/XGBoost addestrati
+trained_models = {}
+
+print(f"\n{'Modello':<20} | {'R2 Score':<10} | {'MAE':<10}")
+print("-" * 45)
+
+for name, sklearn_model in models:  # ← CAMBIATO: sklearn_model invece di model
+    sklearn_model.fit(X_train, y_train.values.ravel())
+    predictions = sklearn_model.predict(X_test)
+
+    r2 = r2_score(y_test, predictions)
+    mae = mean_absolute_error(y_test, predictions)
+
+    # Salva il modello addestrato nel dizionario
+    trained_models[name] = sklearn_model
+
+    print(f"{name:<20} | R2: {r2:>6.3f} | MAE: {mae:>6.3f}")
+
+
+# Salva tutti i modelli sklearn/XGBoost in un unico file pickle
+joblib.dump(trained_models, 'abalone_sklearn_models.pkl')
+print("\n✓ Modelli sklearn/XGBoost salvati in 'abalone_sklearn_models.pkl'")
+
+
+#Ora 'model' contiene ancora la rete neurale Keras
+model.save('abalone_neural_network.keras')
+print("✓ Rete neurale salvata in 'abalone_neural_network.keras'")
+
+# Salva anche lo scaler
+joblib.dump(scaler, 'abalone_scaler.pkl')
+print("✓ Scaler salvato in 'abalone_scaler.pkl'")
