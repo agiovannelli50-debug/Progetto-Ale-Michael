@@ -39,14 +39,14 @@ df = pd.DataFrame(X, columns=abalone.feature_names)
 # Data Cleaning - Il dataset è già pulito ma controlliamo per sicurezza
 df.isnull().sum()
 
-"""
+
 # --- ANALISI DATASET ---
 print("Colonne dataset:\n",df.columns,"\n")
 print("Prime righe dataset:\n",df.head(),"\n")
 print("Shape dataset:\n",df.shape,"\n")
 print("Info dataset:\n",df.info,"\n")
 print("Statistiche dataset:\n",df.describe(),"\n")
-"""
+
 
 ### ONE HOT ENCODING 'Sex'
 # (drop della prima per evitare multicollinearità con altre dummy columns)
@@ -55,12 +55,12 @@ df = pd.get_dummies(df, columns=['Sex'], dtype=int, drop_first=True)
 
 ### MATRICE CORRELAZIONE & HEATMAP
 #  Per trovare pattern tra variabili diverse, heatmap su dati normalizzati è quasi sempre scelta corretta.
-#  Mostrare un report finale su grandezze reali  ---> heatmap con valori normali
+#  Mostrare un report finale su grandezze reali ---> heatmap con valori normali
 
 correlation = df.corr()
 # print("\nMatrice di Correlazione:\n", correlation,"\n")
 
-"""plt.figure(figsize=(10,10))
+plt.figure(figsize=(10,10))
 sns.heatmap(correlation,
             annot=True,
             cmap="vlag",
@@ -69,8 +69,8 @@ sns.heatmap(correlation,
             annot_kws={"size": 8},
             fmt=".1f"              ## fmt=".1f" = 1 cifra dopo la virgola
         )
-"""
-#plt.show()
+
+plt.show()
 
 ### FEATURE ENGINEERING
 # Dalla heatmap le feature sono correlate tantissimo tra loro (>0.9)
@@ -104,15 +104,18 @@ df_fit2 = scaler.fit_transform(df)
 # Trasformiamo l'array di nuovo in un DataFrame per mantenere i nomi delle colonne
 df_norm2 = pd.DataFrame(df_fit2, columns=df.columns)
 
-"""### NUOVA HEATMAP
+### NUOVA HEATMAP
 plt.figure(figsize=(12, 10))
 sns.heatmap(df_norm2.corr(), annot=True, cmap="vlag", fmt=".2f")
 plt.title("Heatmap dopo Feature Engineering e Normalizzazione")
-#plt.show()"""
+plt.show()
 
 # SPLITTING DATASET
 X_final = df_norm2
 X_train, X_test, y_train, y_test = train_test_split(X_final, y, test_size=0.2, random_state=42)
+
+
+
 
 ### MODEL TRAINING
 
@@ -194,8 +197,7 @@ for name, sklearn_model in models:  # ← CAMBIATO: sklearn_model invece di mode
 joblib.dump(trained_models, 'abalone_sklearn_models.pkl')
 print("\n✓ Modelli sklearn/XGBoost salvati in 'abalone_sklearn_models.pkl'")
 
-
-#Ora 'model' contiene ancora la rete neurale Keras
+# Ora 'model' contiene ancora la rete neurale Keras
 model.save('abalone_neural_network.keras')
 print("✓ Rete neurale salvata in 'abalone_neural_network.keras'")
 
