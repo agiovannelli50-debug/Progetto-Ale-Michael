@@ -34,7 +34,7 @@ y_encoded = le_y.fit_transform(y)
 # Conversione Dataset in Pandas Dataframe (NON encodato)
 df = pd.DataFrame(X, columns=mushroom.feature_names)
 
-# Data Cleaning - Il dataset è già pulito ma controlliamo per sicurezza
+# Data Cleaning
 print(df.isnull().sum())
 df["stalk-root"] = df["stalk-root"].fillna("Unknown")
 
@@ -138,7 +138,8 @@ print("\n",df.head())
 
 
 
-'''### MATRICE CORRELAZIONE & HEATMAP DOPO FEATURE ENGINEERING E LABEL ENCODING
+'''
+### MATRICE CORRELAZIONE & HEATMAP DOPO FEATURE ENGINEERING E LABEL ENCODING
 print("Generazione heatmap correlazione...")
 correlation = df.corr()
 
